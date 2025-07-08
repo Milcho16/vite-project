@@ -1,114 +1,162 @@
 import * as React from "react";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Checkbox from "@mui/material/Checkbox";
-import CssBaseline from "@mui/material/CssBaseline";
-import Divider from "@mui/material/Divider";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormLabel from "@mui/material/FormLabel";
-import FormControl from "@mui/material/FormControl";
-import Link from "@mui/material/Link";
-import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
-import Stack from "@mui/material/Stack";
-import MuiCard from "@mui/material/Card";
-import { styled } from "@mui/material/styles";
-import * as yup from "yup";
+import {
+  TextField,
+  Button,
+  Typography,
+  FormControl,
+  FormLabel,
+  CssBaseline,
+  Card,
+  Box,
+  Collapse,
+} from "@mui/material";
 import { useFormik } from "formik";
+import * as yup from "yup";
 
-const Card = styled(MuiCard)(({ theme }) => ({
-  display: "flex",
-  flexDirection: "column",
-  alignSelf: "center",
-  width: "100%",
-  padding: theme.spacing(4),
-  gap: theme.spacing(2),
-  margin: "auto",
-  boxShadow:
-    "hsla(220, 30%, 5%, 0.05) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.05) 0px 15px 35px -5px",
-  [theme.breakpoints.up("sm")]: {
-    width: "450px",
-  },
-  ...theme.applyStyles("dark", {
-    boxShadow:
-      "hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px",
-  }),
-}));
-
-const SignUpContainer = styled(Stack)(({ theme }) => ({
-  height: "calc((1 - var(--template-frame-height, 0)) * 100dvh)",
-  minHeight: "100%",
-  padding: theme.spacing(2),
-  [theme.breakpoints.up("sm")]: {
-    padding: theme.spacing(4),
-  },
-  "&::before": {
-    content: '""',
-    display: "block",
-    position: "absolute",
-    zIndex: -1,
-    inset: 0,
-    backgroundImage:
-      "radial-gradient(ellipse at 50% 50%, hsl(210, 100%, 97%), hsl(0, 0%, 100%))",
-    backgroundRepeat: "no-repeat",
-    ...theme.applyStyles("dark", {
-      backgroundImage:
-        "radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))",
-    }),
-  },
-}));
-
+// Валидация
 const validationSchema = yup.object({
-  email: yup
-    .string("Enter your email")
-    .email("Enter a valid email")
-    .required("Email is required"),
+  name: yup.string().required("Името е задължително"),
+  email: yup.string().email("Невалиден имейл").required("Имейл е задължителен"),
+  password: yup.string().min(6, "Минимум 6 символа").required("Паролата е задължителна"),
+  phone: yup.string().when("step", {
+    is: 2,
+    then: yup.string().required("Телефонът е задължителен"),
+  }),
 });
 
-export default function SignUp(props) {
+export default function SignUp() {
+  const [step, setStep] = React.useState(1);
+
   const formik = useFormik({
-    initialValues: {
-      email: "foobar@example.com",
-    },
-    validationSchema: validationSchema,
+    initialValues: { name: "", email: "", password: "", phone: "" },
+    validationSchema,
     onSubmit: (values) => {
-      console.log(values);
+      console.log("Финални данни:", values);
     },
   });
 
+  const handleNextStep = () => {
+    if (step === 1) {
+      setStep(2);
+    }
+  };
+
   return (
-    <form onSubmit={formik.handleSubmit}>
-      <CssBaseline enableColorScheme />
-      <SignUpContainer direction="column" justifyContent="space-between">
-        <Card variant="outlined">
-          <Typography
-            component="h1"
-            variant="h4"
-            sx={{ width: "100%", fontSize: "clamp(2rem, 10vw, 2.15rem)" }}
-          >
-            Sign up
+    <>
+      <CssBaseline />
+      <Box
+        sx={{
+          minHeight: "100vh",
+          background: "linear-gradient(135deg, #2196f3 0%, #e3f2fd 100%)",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          px: 2,
+        }}
+      >
+        <Card
+          elevation={6}
+          sx={{
+            maxWidth: 500,
+            width: "100%",
+            p: 4,
+            borderRadius: 5,
+            background: "rgba(255, 255, 255, 0.95)",
+            backdropFilter: "blur(10px)",
+          }}
+        >
+          <Typography variant="h4" align="center" sx={{ mb: 4, color: "#1565c0", fontWeight: 700 }}>
+            Регистрация
           </Typography>
 
-          <FormControl>
-              <FormLabel htmlFor="email">Email</FormLabel>
-              <TextField
-                fullWidth
-                id="email"
-                name="email"
-                label="Email"
-                value={formik.values.email}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                error={formik.touched.email && Boolean(formik.errors.email)}
-                helperText={formik.touched.email && formik.errors.email}
-              />
-            </FormControl>
+          <form onSubmit={formik.handleSubmit}>
+            {/* Стъпка 1 */}
+            {step === 1 && (
+              <>
+                <FormControl fullWidth sx={{ mb: 3 }}>
+                  <FormLabel>Име</FormLabel>
+                  <TextField
+                    id="name"
+                    name="name"
+                    placeholder="your name"
+                    value={formik.values.name}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.name && Boolean(formik.errors.name)}
+                    helperText={formik.touched.name && formik.errors.name}
+                  />
+                </FormControl>
 
-            <Button type="submit" fullWidth variant="contained">
-              Sign up
-            </Button>
+                <FormControl fullWidth sx={{ mb: 3 }}>
+                  <FormLabel>Имейл</FormLabel>
+                  <TextField
+                    id="email"
+                    name="email"
+                    placeholder="you@example.com"
+                    value={formik.values.email}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.email && Boolean(formik.errors.email)}
+                    helperText={formik.touched.email && formik.errors.email}
+                  />
+                </FormControl>
+
+                <FormControl fullWidth sx={{ mb: 4 }}>
+                  <FormLabel>Парола</FormLabel>
+                  <TextField
+                    id="password"
+                    name="password"
+                    type="password"
+                    placeholder="●●●●●●"
+                    value={formik.values.password}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.password && Boolean(formik.errors.password)}
+                    helperText={formik.touched.password && formik.errors.password}
+                  />
+                </FormControl>
+
+                <Button
+                  fullWidth
+                  variant="contained"
+                  sx={{ background: "#1976d2", mb: 2 }}
+                  onClick={handleNextStep}
+                >
+                  Следваща стъпка
+                </Button>
+              </>
+            )}
+
+            {/* Стъпка 2 (нова форма) */}
+            <Collapse in={step === 2}>
+              <>
+                <FormControl fullWidth sx={{ mb: 4 }}>
+                  <FormLabel>Телефон</FormLabel>
+                  <TextField
+                    id="phone"
+                    name="phone"
+                    placeholder="+359 88 123 4567"
+                    value={formik.values.phone}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.phone && Boolean(formik.errors.phone)}
+                    helperText={formik.touched.phone && formik.errors.phone}
+                  />
+                </FormControl>
+
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  sx={{ background: "#0d47a1" }}
+                >
+                  Завърши регистрация
+                </Button>
+              </>
+            </Collapse>
+          </form>
         </Card>
-      </SignUpContainer>
-    </form>
+      </Box>
+    </>
   );
 }
