@@ -28,7 +28,7 @@ export default function SignUp() {
   const [step, setStep] = React.useState(1);
 
   const formik = useFormik({
-    initialValues: { name: "", email: "", password: "", phone: "" },
+    initialValues: { name: "", email: "", password: "", },
     validationSchema,
     onSubmit: (values) => {
       console.log("Финални данни:", values);
@@ -120,7 +120,7 @@ export default function SignUp() {
                   fullWidth
                   variant="contained"
                   sx={{ background: "#1976d2", mb: 2 }}
-                  onClick={handleNextStep}
+                 type="submit"
                 >
                   Следваща стъпка
                 </Button>
@@ -130,28 +130,7 @@ export default function SignUp() {
             {/* Стъпка 2 (нова форма) */}
             <Collapse in={step === 2}>
               <>
-                <FormControl fullWidth sx={{ mb: 4 }}>
-                  <FormLabel>Телефон</FormLabel>
-                  <TextField
-                    id="phone"
-                    name="phone"
-                    placeholder="+359 88 123 4567"
-                    value={formik.values.phone}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={formik.touched.phone && Boolean(formik.errors.phone)}
-                    helperText={formik.touched.phone && formik.errors.phone}
-                  />
-                </FormControl>
-
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  sx={{ background: "#0d47a1" }}
-                >
-                  Завърши регистрация
-                </Button>
+                
               </>
             </Collapse>
           </form>
